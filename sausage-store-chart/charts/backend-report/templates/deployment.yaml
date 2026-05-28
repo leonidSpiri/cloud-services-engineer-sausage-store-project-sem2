@@ -2,52 +2,52 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: { { printf "%s-%s" .Release.Name .Chart.Name | quote } }
-  namespace: { { .Release.Namespace | quote } }
+  name: "{{ .Release.Name }}-{{ .Chart.Name }}"
+  namespace: "{{ .Release.Namespace }}"
   labels:
-    app.kubernetes.io/name: { { .Chart.Name | quote } }
-    app.kubernetes.io/instance: { { .Release.Name | quote } }
-    app.kubernetes.io/version: { { .Chart.AppVersion | quote } }
-    app.kubernetes.io/managed-by: { { .Release.Service | quote } }
-    helm.sh/chart: { { printf "%s-%s" .Chart.Name .Chart.Version | quote } }
-    app.kubernetes.io/component: { { .Chart.Name | quote } }
+    app.kubernetes.io/name: "{{ .Chart.Name }}"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/component: "{{ .Chart.Name }}"
     app.kubernetes.io/part-of: "sausage-store"
-    env: { { .Values.global.environment | quote } }
+    env: "{{ .Values.global.environment }}"
 spec:
-  revisionHistoryLimit: { { .Values.revisionHistoryLimit } }
-  replicas: { { .Values.replicas } }
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: {{ .Values.replicas }}
   strategy:
-  { { - toYaml .Values.strategy | nindent 4 } }
-selector:
-  matchLabels:
-    app: { { printf "%s-%s" .Release.Name .Chart.Name | quote } }
-template:
-  metadata:
-    labels:
-      app: { { printf "%s-%s" .Release.Name .Chart.Name | quote } }
-      app.kubernetes.io/name: { { .Chart.Name | quote } }
-      app.kubernetes.io/instance: { { .Release.Name | quote } }
-      app.kubernetes.io/component: { { .Chart.Name | quote } }
-      app.kubernetes.io/part-of: "sausage-store"
-      env: { { .Values.global.environment | quote } }
-  spec:
-    containers:
-      - name: { { .Chart.Name | quote } }
-        image: { { .Values.image | quote } }
-        imagePullPolicy: { { .Values.global.imagePullPolicy | quote } }
-        env:
-          - name: PORT
-            valueFrom:
-              configMapKeyRef:
-                name: { { printf "%s-%s-conf" .Release.Name .Chart.Name | quote } }
-                key: PORT
-          - name: DB
-            valueFrom:
-              secretKeyRef:
-                name: { { printf "%s-%s-secret" .Release.Name .Chart.Name | quote } }
-                key: DB
-        resources:
-  { { - toYaml .Values.resources | nindent 12 } }
-ports:
-  - name: http
-    containerPort: { { .Values.containerPort } }
+{{- toYaml .Values.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-{{ .Chart.Name }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-{{ .Chart.Name }}"
+        app.kubernetes.io/name: "{{ .Chart.Name }}"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
+        app.kubernetes.io/component: "{{ .Chart.Name }}"
+        app.kubernetes.io/part-of: "sausage-store"
+        env: "{{ .Values.global.environment }}"
+    spec:
+      containers:
+        - name: "{{ .Chart.Name }}"
+          image: "{{ .Values.image }}"
+          imagePullPolicy: "{{ .Values.global.imagePullPolicy }}"
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Name }}-{{ .Chart.Name }}-conf"
+                  key: PORT
+            - name: DB
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-{{ .Chart.Name }}-secret"
+                  key: DB
+          resources:
+{{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}

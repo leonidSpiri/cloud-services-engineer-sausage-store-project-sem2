@@ -2,30 +2,30 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: { { printf "%s-%s-ingress" .Release.Name .Chart.Name | quote } }
+  name: "{{ .Release.Name }}-{{ .Chart.Name }}-ingress"
   labels:
-    app.kubernetes.io/name: { { .Chart.Name | quote } }
-    app.kubernetes.io/instance: { { .Release.Name | quote } }
-    app.kubernetes.io/version: { { .Chart.AppVersion | quote } }
-    app.kubernetes.io/managed-by: { { .Release.Service | quote } }
-    helm.sh/chart: { { printf "%s-%s" .Chart.Name .Chart.Version | quote } }
-    app.kubernetes.io/component: { { .Chart.Name | quote } }
+    app.kubernetes.io/name: "{{ .Chart.Name }}"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/component: "{{ .Chart.Name }}"
     app.kubernetes.io/part-of: "sausage-store"
-    env: { { .Values.global.environment | quote } }
+    env: "{{ .Values.global.environment }}"
 spec:
   ingressClassName: "nginx"
   tls:
     - hosts:
-        - { { .Values.ingress.host | quote } }
-      secretName: { { .Values.ingress.tlsSecretName | quote } }
+        - "{{ .Values.ingress.host }}"
+      secretName: "{{ .Values.ingress.tlsSecretName }}"
   rules:
-    - host: { { .Values.ingress.host | quote } }
+    - host: "{{ .Values.ingress.host }}"
       http:
         paths:
-          - path: { { .Values.ingress.path | quote } }
-            pathType: { { .Values.ingress.pathType | quote } }
+          - path: "{{ .Values.ingress.path }}"
+            pathType: "{{ .Values.ingress.pathType }}"
             backend:
               service:
-                name: { { printf "%s-%s-service" .Release.Name .Chart.Name | quote } }
+                name: "{{ .Release.Name }}-{{ .Chart.Name }}-service"
                 port:
-                  number: { { .Values.service.port } }
+                  number: {{ .Values.service.port }}

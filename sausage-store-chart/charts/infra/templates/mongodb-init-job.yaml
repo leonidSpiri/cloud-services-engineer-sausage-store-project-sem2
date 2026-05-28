@@ -5,30 +5,30 @@ metadata:
   name: "mongodb-reports-secret"
   labels:
     app.kubernetes.io/name: "mongodb-reports"
-    app.kubernetes.io/instance: { { .Release.Name | quote } }
-    app.kubernetes.io/managed-by: { { .Release.Service | quote } }
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
     app.kubernetes.io/component: "database"
     app.kubernetes.io/part-of: "sausage-store"
-    env: { { .Values.global.environment | quote } }
+    env: "{{ .Values.global.environment }}"
 type: Opaque
 stringData:
-  MONGO_DATABASE: { { .Values.mongodb.database | quote } }
-  MONGO_REPORTS_USERNAME: { { .Values.mongodb.reportsUsername | quote } }
-  MONGO_REPORTS_PASSWORD: { { .Values.mongodb.reportsPassword | quote } }
+  MONGO_DATABASE: "{{ .Values.mongodb.database }}"
+  MONGO_REPORTS_USERNAME: "{{ .Values.mongodb.reportsUsername }}"
+  MONGO_REPORTS_PASSWORD: "{{ .Values.mongodb.reportsPassword }}"
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: { { printf "%s-mongodb-init" .Release.Name | quote } }
+  name: "{{ .Release.Name }}-mongodb-init"
   labels:
     app.kubernetes.io/name: "mongodb-init"
-    app.kubernetes.io/instance: { { .Release.Name | quote } }
-    app.kubernetes.io/version: { { .Chart.AppVersion | quote } }
-    app.kubernetes.io/managed-by: { { .Release.Service | quote } }
-    helm.sh/chart: { { printf "%s-%s" .Chart.Name .Chart.Version | quote } }
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app.kubernetes.io/component: "database-init"
     app.kubernetes.io/part-of: "sausage-store"
-    env: { { .Values.global.environment | quote } }
+    env: "{{ .Values.global.environment }}"
   annotations:
     helm.sh/hook: "post-install,post-upgrade"
     helm.sh/hook-weight: "5"
@@ -39,16 +39,16 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: "mongodb-init"
-        app.kubernetes.io/instance: { { .Release.Name | quote } }
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
         app.kubernetes.io/component: "database-init"
         app.kubernetes.io/part-of: "sausage-store"
-        env: { { .Values.global.environment | quote } }
+        env: "{{ .Values.global.environment }}"
     spec:
       restartPolicy: OnFailure
       containers:
         - name: "mongodb-init"
-          image: { { .Values.mongodb.image | quote } }
-          imagePullPolicy: { { .Values.global.imagePullPolicy | quote } }
+          image: "{{ .Values.mongodb.image }}"
+          imagePullPolicy: "{{ .Values.global.imagePullPolicy }}"
           envFrom:
             - secretRef:
                 name: "mongodb-secret"
@@ -80,4 +80,4 @@ spec:
                 }
               '
           resources:
-  { { - toYaml .Values.mongodb.resources | nindent 12 } }
+{{- toYaml .Values.mongodb.resources | nindent 12 }}
