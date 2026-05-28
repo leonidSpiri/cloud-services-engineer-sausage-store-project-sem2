@@ -2,26 +2,27 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: "{{ .Release.Name }}-{{ .Chart.Name }}-hpa"
+  name: { { printf "%s-%s-hpa" .Release.Name .Chart.Name | quote } }
   labels:
-    app.kubernetes.io/name: "{{ .Chart.Name }}"
-    app.kubernetes.io/instance: "{{ .Release.Name }}"
-    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
-    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app.kubernetes.io/component: "{{ .Chart.Name }}"
-    app.kubernetes.io/part-of: sausage-store
+    app.kubernetes.io/name: { { .Chart.Name | quote } }
+    app.kubernetes.io/instance: { { .Release.Name | quote } }
+    app.kubernetes.io/version: { { .Chart.AppVersion | quote } }
+    app.kubernetes.io/managed-by: { { .Release.Service | quote } }
+    helm.sh/chart: { { printf "%s-%s" .Chart.Name .Chart.Version | quote } }
+    app.kubernetes.io/component: { { .Chart.Name | quote } }
+    app.kubernetes.io/part-of: "sausage-store"
+    env: { { .Values.global.environment | quote } }
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: "{{ .Release.Name }}-{{ .Chart.Name }}"
-  minReplicas: 1
-  maxReplicas: 3
+    name: { { printf "%s-%s" .Release.Name .Chart.Name | quote } }
+  minReplicas: { { .Values.hpa.minReplicas } }
+  maxReplicas: { { .Values.hpa.maxReplicas } }
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 75
+          averageUtilization: { { .Values.hpa.averageUtilization } }

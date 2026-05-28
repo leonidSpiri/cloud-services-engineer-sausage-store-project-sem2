@@ -10,6 +10,8 @@ frontend:
     type: Recreate
   service:
     port: 80
+  backendService:
+    port: 8080
   ingress:
     host: front-lspiridonov.2sem.students-projects.ru
     path: /
@@ -112,7 +114,7 @@ infra:
     storage: 1Gi
     resources:
       requests:
-        memory: "256Mi"
+        memory: "128Mi"
         cpu: "250m"
       limits:
         memory: "512Mi"
@@ -130,7 +132,7 @@ infra:
     storage: 1Gi
     resources:
       requests:
-        memory: "256Mi"
+        memory: "128Mi"
         cpu: "250m"
       limits:
         memory: "512Mi"

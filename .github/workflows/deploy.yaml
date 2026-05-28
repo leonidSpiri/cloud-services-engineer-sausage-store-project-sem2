@@ -95,11 +95,6 @@ jobs:
       - name: Lint Helm chart
         run: helm lint ./sausage-store-chart
 
-      - name: Show backend-report deployment template
-        run: |
-          nl -ba sausage-store-chart/charts/backend-report/templates/deployment.yaml
-          sed -n '1,120l' sausage-store-chart/charts/backend-report/templates/deployment.yaml
-
       - name: Package Helm chart
         run: |
           echo "Packaging chart version: ${HELM_CHART_VERSION}"
