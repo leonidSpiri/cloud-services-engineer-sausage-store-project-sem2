@@ -21,11 +21,11 @@ frontend:
   image: lspiridonov/sausage-frontend:latest
   resources:
     requests:
-      memory: "128Mi"
-      cpu: "100m"
+      memory: "64Mi"
+      cpu: "50m"
     limits:
       memory: "128Mi"
-      cpu: "1"
+      cpu: "150m"
   nginxConf: nginx.conf
 
 backend:
@@ -54,10 +54,10 @@ backend:
   resources:
     requests:
       memory: "256Mi"
-      cpu: "100m"
+      cpu: "150m"
     limits:
       memory: "512Mi"
-      cpu: "1"
+      cpu: "500m"
   containerPort: 8080
   livenessProbe:
     httpGet:
@@ -92,11 +92,11 @@ backend-report:
     db: mongodb://reports:reportspassword@mongodb:27017/sausage-store?authSource=sausage-store
   resources:
     requests:
-      memory: "128Mi"
-      cpu: "100m"
+      memory: "64Mi"
+      cpu: "75m"
     limits:
-      memory: "256Mi"
-      cpu: "500m"
+      memory: "192Mi"
+      cpu: "250m"
   hpa:
     minReplicas: 1
     maxReplicas: 3
@@ -114,11 +114,11 @@ infra:
     storage: 1Gi
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "250m"
+        memory: "96Mi"
+        cpu: "100m"
       limits:
-        memory: "512Mi"
-        cpu: "1"
+        memory: "384Mi"
+        cpu: "350m"
   mongodb:
     image: mongo:7.0
     rootUsername: root
@@ -132,8 +132,8 @@ infra:
     storage: 1Gi
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "250m"
+        memory: "96Mi"
+        cpu: "100m"
       limits:
-        memory: "512Mi"
-        cpu: "1"
+        memory: "384Mi"
+        cpu: "350m"
