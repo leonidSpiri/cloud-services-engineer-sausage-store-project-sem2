@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: { { .Release.Name } }-{{ .Chart.Name }}
-  namespace: { { .Release.Namespace } }
+  name: "{{ .Release.Name }}-{{ .Chart.Name }}"
+  namespace: "{{ .Release.Namespace }}"
   labels:
-    app.kubernetes.io/name: { { .Chart.Name } }
+    app.kubernetes.io/name: "{{ .Chart.Name }}"
     app.kubernetes.io/instance: "{{ .Release.Name }}"
     app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
     app.kubernetes.io/managed-by: "{{ .Release.Service }}"
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app.kubernetes.io/component: { { .Chart.Name } }
+    app.kubernetes.io/component: "{{ .Chart.Name }}"
     app.kubernetes.io/part-of: sausage-store
 spec:
   revisionHistoryLimit: { { .Values.revisionHistoryLimit } }
@@ -19,33 +19,38 @@ spec:
     type: { { .Values.strategy.type | default "Recreate" } }
   selector:
     matchLabels:
-      app: { { .Release.Name } }-{{ .Chart.Name }}
+      app: "{{ .Release.Name }}-{{ .Chart.Name }}"
   template:
     metadata:
       labels:
-        app: { { .Release.Name } }-{{ .Chart.Name }}
-        app.kubernetes.io/name: { { .Chart.Name } }
+        app: "{{ .Release.Name }}-{{ .Chart.Name }}"
+        app.kubernetes.io/name: "{{ .Chart.Name }}"
         app.kubernetes.io/instance: "{{ .Release.Name }}"
-        app.kubernetes.io/component: { { .Chart.Name } }
+        app.kubernetes.io/component: "{{ .Chart.Name }}"
         app.kubernetes.io/part-of: sausage-store
     spec:
       containers:
-        - name: { { .Chart.Name } }
-          image: { { .Values.image } }
-          imagePullPolicy: { { .Values.global.imagePullPolicy } }
+        - name: "{{ .Chart.Name }}"
+          image: "{{ .Values.image }}"
+          imagePullPolicy: "{{ .Values.global.imagePullPolicy }}"
           env:
             - name: PORT
               valueFrom:
                 configMapKeyRef:
-                  name: { { .Release.Name } }-{{ .Chart.Name }}-conf
+                  name: "{{ .Release.Name }}-{{ .Chart.Name }}-conf"
                   key: PORT
             - name: DB
               valueFrom:
                 secretKeyRef:
-                  name: { { .Release.Name } }-{{ .Chart.Name }}-secret
+                  name: "{{ .Release.Name }}-{{ .Chart.Name }}-secret"
                   key: DB
           resources:
-  { { toYaml .Values.resources | indent 12 } }
-ports:
-  - name: http
-    containerPort: { { .Values.containerPort } }
+            requests:
+              memory: { { .Values.resources.requests.memory | quote } }
+              cpu: { { .Values.resources.requests.cpu | quote } }
+            limits:
+              memory: { { .Values.resources.limits.memory | quote } }
+              cpu: { { .Values.resources.limits.cpu | quote } }
+          ports:
+            - name: http
+              containerPort: { { .Values.containerPort } }
