@@ -13,6 +13,7 @@ env:
   BACKEND_IMAGE: lspiridonov/sausage-backend
   FRONTEND_IMAGE: lspiridonov/sausage-frontend
   BACKEND_REPORT_IMAGE: lspiridonov/sausage-backend-report
+  HELM_CHART_VERSION: 0.1.${{ github.run_number }}-${{ github.run_attempt }}
   NEXUS_HELM_REPO: ${{ secrets.NEXUS_HELM_REPO }}
   NEXUS_HELM_REPO_USER: ${{ secrets.NEXUS_HELM_REPO_USER }}
   NEXUS_HELM_REPO_PASSWORD: ${{ secrets.NEXUS_HELM_REPO_PASSWORD }}
@@ -97,7 +98,7 @@ jobs:
           mkdir -p packaged-chart
           helm package ./sausage-store-chart \
             --destination packaged-chart \
-            --version "0.1.${{ github.run_number }}" \
+            --version "$HELM_CHART_VERSION" \
             --app-version "${{ github.sha }}"
 
       - name: Upload Helm chart to Nexus
@@ -149,8 +150,16 @@ jobs:
 
       - name: Deploy Helm chart to Kubernetes
         run: |
+          helm template sausage-store nexus/sausage-store \
+            --version "$HELM_CHART_VERSION" \
+            --namespace "$SAUSAGE_STORE_NAMESPACE" \
+            --set backend.image="${BACKEND_IMAGE}:${GITHUB_SHA}" \
+            --set frontend.image="${FRONTEND_IMAGE}:${GITHUB_SHA}" \
+            --set backend-report.image="${BACKEND_REPORT_IMAGE}:${GITHUB_SHA}" \
+            >/tmp/sausage-store-rendered.yaml
+          
           helm upgrade --install sausage-store nexus/sausage-store \
-            --version "0.1.${{ github.run_number }}" \
+            --version "$HELM_CHART_VERSION" \
             --namespace "$SAUSAGE_STORE_NAMESPACE" \
             --create-namespace \
             --wait \
