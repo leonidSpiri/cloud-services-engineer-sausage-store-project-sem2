@@ -13,10 +13,10 @@ metadata:
     app.kubernetes.io/component: "{{ .Chart.Name }}"
     app.kubernetes.io/part-of: sausage-store
 spec:
-  revisionHistoryLimit: { { .Values.revisionHistoryLimit } }
-  replicas: { { .Values.replicas } }
+  revisionHistoryLimit: 15
+  replicas: 1
   strategy:
-    type: { { .Values.strategy.type | default "Recreate" } }
+    type: Recreate
   selector:
     matchLabels:
       app: "{{ .Release.Name }}-{{ .Chart.Name }}"
@@ -31,8 +31,8 @@ spec:
     spec:
       containers:
         - name: "{{ .Chart.Name }}"
-          image: "{{ .Values.image }}"
-          imagePullPolicy: "{{ .Values.global.imagePullPolicy }}"
+          image: "lspiridonov/sausage-backend-report:latest"
+          imagePullPolicy: "Always"
           env:
             - name: PORT
               valueFrom:
@@ -46,11 +46,11 @@ spec:
                   key: DB
           resources:
             requests:
-              memory: { { .Values.resources.requests.memory | quote } }
-              cpu: { { .Values.resources.requests.cpu | quote } }
+              memory: "128Mi"
+              cpu: "100m"
             limits:
-              memory: { { .Values.resources.limits.memory | quote } }
-              cpu: { { .Values.resources.limits.cpu | quote } }
+              memory: "256Mi"
+              cpu: "500m"
           ports:
             - name: http
-              containerPort: { { .Values.containerPort } }
+              containerPort: 8080
