@@ -34,6 +34,8 @@ backend:
     port: "8080"
     scrape: "true"
   env:
+    vaultEnabled: "false"
+    vaultHealthEnabled: "false"
     postgresUri: jdbc:postgresql://postgresql:5432/sausage-store
     postgresUser: store
     postgresPassword: storepassword
